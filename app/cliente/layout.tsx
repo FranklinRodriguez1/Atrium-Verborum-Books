@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 type IconName =
   | "search"
+  | "cart"
   | "bell"
   | "user"
   | "grid"
@@ -17,6 +18,13 @@ const icons: Record<IconName, React.ReactNode> = {
     <>
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-3.6-3.6" />
+    </>
+  ),
+  cart: (
+    <>
+      <circle cx="9" cy="20" r="1.25" />
+      <circle cx="18" cy="20" r="1.25" />
+      <path d="M2.5 4h2.5l2.4 10.2a1 1 0 0 0 1 .8h9.7a1 1 0 0 0 1-.8L21 7H6.2" />
     </>
   ),
   bell: (
@@ -65,6 +73,7 @@ const icons: Record<IconName, React.ReactNode> = {
 const navItems = [
   { label: "Dashboard", icon: "grid", href: "/cliente/dashboard" },
   { label: "Book Store", icon: "book", href: "/cliente/bookStore" },
+  { label: "Shop Cart", icon: "cart", href: "/cliente/shopcar" },
   { label: "Locations", icon: "map", href: "#" },
   { label: "Settings", icon: "settings", href: "#" },
 ] satisfies { label: string; icon: IconName; href: string }[];
@@ -119,6 +128,13 @@ export default function ClienteLayout({ children }: { children: ReactNode }) {
                 type="search"
               />
             </label>
+            <a
+              aria-label="Shopping cart"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-black transition hover:bg-zinc-100"
+              href="/cliente/shopcar"
+            >
+              <Icon name="cart" />
+            </a>
             <button
               aria-label="Notifications"
               className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-black transition hover:bg-zinc-100"
@@ -172,7 +188,7 @@ export default function ClienteLayout({ children }: { children: ReactNode }) {
         {children}
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t border-zinc-200 bg-white/95 px-3 pb-4 pt-2 shadow-[0_-12px_28px_rgba(15,23,42,0.06)] backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-zinc-200 bg-white/95 px-3 pb-4 pt-2 shadow-[0_-12px_28px_rgba(15,23,42,0.06)] backdrop-blur md:hidden">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
 
