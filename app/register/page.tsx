@@ -23,7 +23,7 @@ export default function Register() {
 
       {/* RIGHT SIDE */}
       <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 md:p-12 bg-white">
-        <div className="w-full max-w-md bg-white rounded-[32px] border border-surface-variant/70 shadow-[0_20px_60px_rgba(15,23,42,0.08)] px-6 py-8 md:px-10 md:py-10">
+        <div className="w-full max-w-md bg-white rounded-[32px]  border-surface-variant/70 shadow-[0_20px_60px_rgba(15,23,42,0.08)] px-6 py-8 md:px-10 md:py-10">
 
           {/* TITLE */}
           <div className="mb-10">
