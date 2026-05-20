@@ -1,6 +1,16 @@
-import styles from './page.module.css';
+"use client";
+import { useState } from 'react';
+import styles from './page.module.css'; 
+import { login } from '../api/auth/login/login';
+
+
 
 export default function Login() {
+  const [email, setEmail] = useState(''); //state to store email input
+  const [password, setPassword] = useState(''); //state to store password input
+  
+
+  
   return (
     <main className="min-h-screen bg-white text-on-surface font-body-md flex items-center justify-center ">
       <section className="w-full min-h-screen flex flex-col md:flex-row overflow-hidden bg-white">
@@ -26,7 +36,7 @@ export default function Login() {
               Step into a curated sanctuary for the modern mind. Experience reading as it was meant to be: focused, elegant, and illuminating.
             </p>
             <div className="mt-xl flex gap-base items-center">
-              <div className="flex -space-x-2">
+              <div className="flex -space-x-2 gap-2.5">
                 <img
                   alt="user"
                   className="h-10 w-10 rounded-full border-2 border-white"
@@ -51,7 +61,7 @@ export default function Login() {
         </aside>
 
         <section className="flex-1 flex items-center justify-center p-margin_mobile md:p-margin_desktop bg-white text-black ">
-            <div className="w-full max-w-lg flex flex-col gap-md rounded-4x1  border-surface-variant/60 bg-white px-6 py-8 shadow-lg md:px-10 md:py-10">
+            <div className="w-full max-w-lg flex flex-col gap-3 rounded-4x1  border-surface-variant/60 bg-white px-6 py-8 shadow-lg md:px-10 md:py-10 ">
                 <div className="md:hidden flex flex-col items-center mb-md">
                 <span className={`${styles.materialSymbolsOutlined} material-symbols-outlined text-3xl text-primary mb-xs`}>
                     auto_stories
@@ -61,14 +71,15 @@ export default function Login() {
 
                 <div className="space-y-3">
                 <h2 className="font-h1 text-h1 text-zinc-950 tracking-tight">Welcome back</h2>
-                <p className="font-body-md text-zinc-500">Enter your credentials to access your library.</p>
+                <p className="font-body-md text-zinc-500">Enter your credentials to access fyour library.</p>
                 </div>
             <form className="flex flex-col gap-6 w-full items-center   mt-sm">
-                <div className="flex flex-col gap-1 w-full">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="font-label-md text-zinc-500" htmlFor="email">
                     Email Address
                     </label>
-                    <input
+                    <input 
+                    onChange={(e)=> {setEmail(e.target.value)}}
                     className="w-full px-4 text-black py-3 bg-surface-container-low rounded-2xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all outline-none text-on-surface font-body-md"
                     id="email"
                     placeholder="name@domain.com"
@@ -76,7 +87,7 @@ export default function Login() {
                     />
                 </div>
 
-                <div className="flex flex-col gap-xs w-full">
+                <div className="flex flex-col gap-2 w-full">
                     <div className="flex justify-between items-center gap-2">
                         <label className="font-label-md text-zinc-500" htmlFor="password">
                             Password
@@ -86,13 +97,13 @@ export default function Login() {
                         </a>
                     </div>
                 <div className="relative gap-2 flex items-center flex-col">
-                  <input
+                  <input onChange={(e)=>{setPassword(e.target.value)}}
                     className="w-full text-black px-4 py-3 bg-surface-container-low rounded-2xl border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all outline-none text-on-surface font-body-md"
                     id="password"
                     placeholder="••••••••"
                     type="password"
                   />
-                  <button className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant" type="button">
+                  <button className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant" type="button" >
                     <span className="material-symbols-outlined text-[20px]"></span>
                   </button>
                 </div>
@@ -100,7 +111,7 @@ export default function Login() {
 
               <button
                 className=" w-3xs py-4 bg-blue-400 text-white font-bold font-label-md rounded-2xl shadow-lg shadow-primary/10 hover:bg-primary-container active:scale-[0.98] transition-all duration-200 hover:bg-white hover:text-primary hover:shadow-md hover:text-blue-400"
-                type="submit"
+                type="submit" onClick={(e)=>{e.preventDefault();  login(email, password)}} 
               >
                 Sign In to My Library
               </button>
@@ -112,7 +123,7 @@ export default function Login() {
               <div className="flex-grow border-t border-outline-variant" />
             </div>
 
-            <div className="grid grid-cols-2 gap-gutter">
+            <div className="grid grid-cols-2 gap-3">
               <button className="flex items-center justify-center gap-xs py-3 border border-outline-variant rounded-2xl hover:bg-surface-container-low transition-colors active:scale-[0.98]">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />

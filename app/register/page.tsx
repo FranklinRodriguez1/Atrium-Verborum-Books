@@ -1,4 +1,23 @@
-export default function Register() {
+"use client" 
+import {useState} from "react"; 
+
+interface registerUserData {
+  name: string,
+  email:string,
+  password:string
+}
+
+export default function Register() { 
+
+  const [data, setData] = useState<registerUserData>({
+    name:"",
+    email: "",
+    password: "",
+  }); //state to store name input 
+  let [password, setPassword] = useState<string>("") ;
+  let [confirmPassword, setconfirmPassword] = useState<string>(""); 
+
+  let passwordSame = password == confirmPassword
   return (
     <div className="bg-background text-on-background font-body-md min-h-screen flex items-stretch">
 
@@ -9,7 +28,7 @@ export default function Register() {
           alt="Library"
           className="absolute inset-0 w-full h-full object-cover opacity-80"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
+        <div className="absolute inset-0  from-primary/60 to-transparent" />
 
         <div className="relative z-10 p-12 flex flex-col justify-end h-full">
           <h2 className="font-serif italic text-white text-4xl mb-2">
@@ -64,7 +83,8 @@ export default function Register() {
                 id="name"
                 type="text"
                 placeholder="Elias Thorne"
-                className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"
+                className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition" 
+                onChange={(e)=>{setData({...data, name:e.target.value})}}
               />
             </div>
 
@@ -76,7 +96,8 @@ export default function Register() {
                 id="email"
                 type="email"
                 placeholder="email@test.com"
-                className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"
+                className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"                 onChange={(e)=>{setData({...data, email:e.target.value})}}
+
               />
             </div>
 
@@ -89,7 +110,8 @@ export default function Register() {
                   id="password"
                   type="password"
                   placeholder="Password"
-                  className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"
+                  className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"                 onChange={(e)=>{setPassword(e.target.value)}}
+
                 />
               </div>
               <div>
@@ -100,19 +122,24 @@ export default function Register() {
                   id="confirm-password"
                   type="password"
                   placeholder="Confirm Password"
-                  className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"
+                  className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition" 
+                  onChange={(e)=>{setconfirmPassword(e.target.value)}}
                 />
               </div>
             </div>
 
             <div className="flex gap-3 items-start">
               <input id="terms" type="checkbox" className="mt-1 h-4 w-4 rounded border-outline-variant text-blue-400 focus:ring-blue-400" />
-              <label htmlFor="terms" className="text-sm text-zinc-600">
+              <label htmlFor="terms" className="text-sm text-zinc-600" >
                 I agree to the Terms of Service and Privacy Policy.
               </label>
             </div>
 
-            <button className="w-full py-4 bg-blue-400 text-white rounded-2xl font-semibold shadow-lg shadow-blue-400/20 hover:bg-blue-500 transition-colors">
+            <button className="w-full py-4 bg-blue-400 text-white rounded-2xl font-semibold shadow-lg shadow-blue-400/20 hover:bg-blue-500 transition-colors" onClick={(e)=>{e.preventDefault();
+             passwordSame ? setData({...data, password:confirmPassword}):console.log("clave incorrecta"); ;
+            
+            }
+            }>
               Create Account
             </button>
           </form>
@@ -127,5 +154,5 @@ export default function Register() {
         </div>
       </div>
     </div>
-  );
+  ); 
 }
