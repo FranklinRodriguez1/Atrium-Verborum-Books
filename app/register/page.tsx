@@ -1,23 +1,38 @@
-"use client" 
-import {useState} from "react"; 
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
 
-interface registerUserData {
-  name: string,
-  email:string,
-  password:string
-}
+export default function Register() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { register } = useAuth();
+  const router = useRouter();
 
-export default function Register() { 
+  async function handleSubmit() {
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
 
-  const [data, setData] = useState<registerUserData>({
-    name:"",
-    email: "",
-    password: "",
-  }); //state to store name input 
-  let [password, setPassword] = useState<string>("") ;
-  let [confirmPassword, setconfirmPassword] = useState<string>(""); 
+    setError("");
+    setIsSubmitting(true);
+    const result = await register(name, email, password);
+    setIsSubmitting(false);
 
-  let passwordSame = password == confirmPassword
+    if (!result.success) {
+      setError(result.message ?? "Could not create your account.");
+      return;
+    }
+
+    router.push("/client/dashboard");
+  }
+
   return (
     <div className="bg-background text-on-background font-body-md min-h-screen flex items-stretch">
 
@@ -28,11 +43,11 @@ export default function Register() {
           alt="Library"
           className="absolute inset-0 w-full h-full object-cover opacity-80"
         />
-        <div className="absolute inset-0  from-primary/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent" />
 
         <div className="relative z-10 p-12 flex flex-col justify-end h-full">
           <h2 className="font-serif italic text-white text-4xl mb-2">
-            Atrium Verborum
+            Lumina Lexicon
           </h2>
           <p className="text-on-primary-container max-w-md">
             Enter a space where every word matters. Your personal sanctuary for deep reading.
@@ -50,7 +65,7 @@ export default function Register() {
               Create an account
             </h1>
             <p className="text-sm text-zinc-600">
-              Join our community of readers.
+              Join our community of thoughtful readers.
             </p>
           </div>
 
@@ -73,7 +88,13 @@ export default function Register() {
           </div>
 
           {/* FORM */}
-          <form className="space-y-5 text-zinc-950">
+          <form className="space-y-5 text-zinc-950" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+
+            {error ? (
+              <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                {error}
+              </p>
+            ) : null}
 
             <div>
               <label className="block text-sm font-medium text-zinc-600 mb-2" htmlFor="name">
@@ -83,8 +104,9 @@ export default function Register() {
                 id="name"
                 type="text"
                 placeholder="Elias Thorne"
-                className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition" 
-                onChange={(e)=>{setData({...data, name:e.target.value})}}
+                className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
 
@@ -95,9 +117,10 @@ export default function Register() {
               <input
                 id="email"
                 type="email"
-                placeholder="email@test.com"
-                className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"                 onChange={(e)=>{setData({...data, email:e.target.value})}}
-
+                placeholder="elias@lexicon.com"
+                className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -110,8 +133,9 @@ export default function Register() {
                   id="password"
                   type="password"
                   placeholder="Password"
-                  className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"                 onChange={(e)=>{setPassword(e.target.value)}}
-
+                  className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <div>
@@ -122,37 +146,38 @@ export default function Register() {
                   id="confirm-password"
                   type="password"
                   placeholder="Confirm Password"
-                  className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition" 
-                  onChange={(e)=>{setconfirmPassword(e.target.value)}}
+                  className="w-full px-4 py-3 bg-slate-50 border border-outline-variant rounded-2xl text-zinc-950 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/20 outline-none transition"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               </div>
             </div>
 
             <div className="flex gap-3 items-start">
-              <input id="terms" type="checkbox" className="mt-1 h-4 w-4 rounded border-outline-variant text-blue-400 focus:ring-blue-400" />
+              <input id="terms" type="checkbox" required className="mt-1 h-4 w-4 rounded border-outline-variant text-blue-400 focus:ring-blue-400" />
               <label htmlFor="terms" className="text-sm text-zinc-600" >
                 I agree to the Terms of Service and Privacy Policy.
               </label>
             </div>
 
-            <button className="w-full py-4 bg-blue-400 text-white rounded-2xl font-semibold shadow-lg shadow-blue-400/20 hover:bg-blue-500 transition-colors" onClick={(e)=>{e.preventDefault();
-             passwordSame ? setData({...data, password:confirmPassword}):console.log("clave incorrecta"); ;
-            
-            }
-            }>
-              Create Account
+            <button
+              className="w-full py-4 bg-gradient-to-r from-[#1a1f38] to-[#3b44a8] text-white rounded-2xl font-semibold shadow-[0_16px_32px_rgba(59,68,168,0.35)] transition-all duration-200 hover:from-[#232a4a] hover:to-[#4d57c4] hover:shadow-[0_20px_40px_rgba(59,68,168,0.45)] active:scale-[0.98] disabled:opacity-60 disabled:hover:from-[#1a1f38] disabled:hover:to-[#3b44a8]"
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating account…" : "Create Account"}
             </button>
           </form>
 
           <p className="mt-6 text-center text-sm text-zinc-500">
-            Already have an account?{' '}
-            <span className="text-blue-400 cursor-pointer hover:underline">
+            Already have an account?{" "}
+            <Link className="text-blue-400 hover:underline" href="/login">
               Login
-            </span>
+            </Link>
           </p>
 
         </div>
       </div>
     </div>
-  ); 
+  );
 }

@@ -6,6 +6,11 @@
   --foreground: #0c1018;
 }
 
+:root[data-theme='dark'] {
+  --background: #0c1018;
+  --foreground: #f8f9fb;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
