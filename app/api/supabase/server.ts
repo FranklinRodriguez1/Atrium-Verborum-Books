@@ -1,18 +1,38 @@
-import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// Server-only client: uses the service role key, bypasses Row Level Security.
-// Never import this file from a Client Component — the key must stay on the server.
-export function createSupabaseServerClient() {
-  if (!supabaseUrl || !supabaseServiceRoleKey) {
+// Server client for the current request's user session (Server Components,
+// Route Handlers). Uses the anon key and the caller's session cookies, so it
+// respects Row Level Security as that specific user. For privileged
+// operations that must bypass RLS, use admin.ts instead.
+export async function createSupabaseServerClient() {
+  if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. Set them in .env.",
+      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. Set them in .env.",
     );
   }
 
-  return createClient(supabaseUrl, supabaseServiceRoleKey, {
-    auth: { persistSession: false },
+  const cookieStore = await cookies();
+
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        } catch {
+          // Called from a Server Component render, where cookies can't be
+          // written. proxy.ts refreshes the session on navigation instead —
+          // safe to ignore here.
+        }
+      },
+    },
   });
 }

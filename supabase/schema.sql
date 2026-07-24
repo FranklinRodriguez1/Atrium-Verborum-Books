@@ -13,7 +13,7 @@ create table public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   nombre text not null,
   email text not null,
-  role text not null default 'cliente' check (role in ('cliente', 'admin')),
+  role text not null default 'client' check (role in ('client', 'librarian')),
   theme_preference text not null default 'light' check (theme_preference in ('light', 'dark')),
   created_at timestamptz not null default now()
 );
@@ -63,9 +63,9 @@ create index order_items_book_id_idx on public.order_items (book_id);
 --
 -- Baseline policies only: readers can see the catalog and manage
 -- their own profile/orders. Writes to books/orders/order_items from
--- the app go through the service-role server client (app/api/supabase/server.ts),
--- which bypasses RLS entirely — refine these once admin/librarian
--- checks are wired to real Supabase auth roles.
+-- the app go through the service-role admin client (app/api/supabase/admin.ts),
+-- which bypasses RLS entirely. Refine these as librarian-side write
+-- paths (inventory, order management) get built out.
 -- ============================================================
 
 alter table public.profiles enable row level security;

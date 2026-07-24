@@ -10,6 +10,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { register } = useAuth();
   const router = useRouter();
@@ -21,12 +22,18 @@ export default function Register() {
     }
 
     setError("");
+    setNotice("");
     setIsSubmitting(true);
     const result = await register(name, email, password);
     setIsSubmitting(false);
 
     if (!result.success) {
       setError(result.message ?? "Could not create your account.");
+      return;
+    }
+
+    if (result.requiresEmailConfirmation) {
+      setNotice(result.message ?? "Check your email to confirm your account before signing in.");
       return;
     }
 
@@ -93,6 +100,12 @@ export default function Register() {
             {error ? (
               <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
                 {error}
+              </p>
+            ) : null}
+
+            {notice ? (
+              <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                {notice}
               </p>
             ) : null}
 

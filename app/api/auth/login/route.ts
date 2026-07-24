@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { findUser } from "../users";
-import { SESSION_COOKIE } from "../session";
+import { createSupabaseServerClient } from "../../supabase/server";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -15,22 +13,31 @@ export async function POST(request: Request) {
     );
   }
 
-  const user = findUser(email, password);
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (!user) {
+  if (error || !data.user) {
     return NextResponse.json(
       { success: false, message: "Invalid email or password." },
       { status: 401 },
     );
   }
 
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, JSON.stringify(user), {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("nombre, role")
+    .eq("id", data.user.id)
+    .single();
 
-  return NextResponse.json({ success: true, user });
+  if (!profile) {
+    return NextResponse.json(
+      { success: false, message: "Account has no profile. Contact an administrator." },
+      { status: 500 },
+    );
+  }
+
+  return NextResponse.json({
+    success: true,
+    user: { name: profile.nombre, role: profile.role },
+  });
 }

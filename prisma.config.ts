@@ -7,6 +7,7 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    seed: "bun run prisma/seed.ts",
   },
   datasource: {
     // CLI operations (migrate, db pull, studio) use the direct connection —
