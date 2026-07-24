@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { registerUser } from "../users";
-import { SESSION_COOKIE } from "../session";
+import { createSupabaseServerClient } from "../../supabase/server";
+import { createSupabaseAdminClient } from "../../supabase/admin";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -23,22 +22,46 @@ export async function POST(request: Request) {
     );
   }
 
-  const user = registerUser(name, email, password);
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.signUp({ email, password });
 
-  if (!user) {
+  if (error) {
+    return NextResponse.json({ success: false, message: error.message }, { status: 409 });
+  }
+
+  if (!data.user) {
     return NextResponse.json(
-      { success: false, message: "An account with that email already exists." },
-      { status: 409 },
+      { success: false, message: "Could not create your account." },
+      { status: 500 },
     );
   }
 
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, JSON.stringify(user), {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+  // Self-registration always creates a client account; librarian accounts
+  // are provisioned separately, not through this public form. Uses the
+  // admin client since there's no RLS insert policy for profiles — this
+  // one write is a system-provisioning step, not an end-user operation.
+  const admin = createSupabaseAdminClient();
+  const { error: profileError } = await admin.from("profiles").insert({
+    id: data.user.id,
+    nombre: name,
+    email,
+    role: "client",
+    theme_preference: "light",
   });
 
-  return NextResponse.json({ success: true, user });
+  if (profileError) {
+    return NextResponse.json({ success: false, message: profileError.message }, { status: 500 });
+  }
+
+  if (!data.session) {
+    // This Supabase project requires email confirmation — there's no active
+    // session yet, so the client can't redirect straight to a dashboard.
+    return NextResponse.json({
+      success: true,
+      requiresEmailConfirmation: true,
+      message: "Check your email to confirm your account before signing in.",
+    });
+  }
+
+  return NextResponse.json({ success: true, user: { name, role: "client" } });
 }

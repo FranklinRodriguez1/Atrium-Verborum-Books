@@ -7,8 +7,13 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    seed: "bun run prisma/seed.ts",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // CLI operations (migrate, db pull, studio) use the direct connection —
+    // Supabase's pooled DATABASE_URL (pgbouncer transaction mode) doesn't
+    // support the advisory locks/prepared statements these commands need.
+    // The app's runtime client (app/api/prisma/client.ts) uses DATABASE_URL instead.
+    url: process.env["DIRECT_URL"],
   },
 });

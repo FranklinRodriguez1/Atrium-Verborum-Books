@@ -9,7 +9,12 @@ type SessionUser = {
   role: Role;
 } | null;
 
-type AuthResult = { success: boolean; message?: string; user?: SessionUser };
+type AuthResult = {
+  success: boolean;
+  message?: string;
+  user?: SessionUser;
+  requiresEmailConfirmation?: boolean;
+};
 
 type AuthContextValue = {
   user: SessionUser;
@@ -56,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     const data = await response.json();
 
-    if (data.success) {
+    if (data.success && data.user) {
       setUser(data.user);
     }
 
